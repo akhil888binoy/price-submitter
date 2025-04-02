@@ -1,5 +1,11 @@
-use crate::configs::envconfig::{CHAINID_MAP, ENV};
-use crate::utils::interfaceutils::AssetInfo;
+
+#[path = "../configs/envconfig.rs"]
+mod envconfig;
+#[path = "./interfaceutils.rs"]
+mod interfaceutils;
+
+use envconfig::{CHAINID_MAP, ENV};
+use interfaceutils::AssetInfo;
 
 use once_cell::sync::Lazy;
 use std::time::Duration;
@@ -59,22 +65,22 @@ pub static SUPPORTED_TOKENS_BERA_TESTNET: Lazy<Vec<&'static str>> =
 pub static SUPPORTED_TOKENS_OPTIMUS_TESTNET: Lazy<Vec<&'static str>> =
     Lazy::new(|| vec!["WEVMOS", "WBTC", "WETH", "WSTETH", "USDC"]);
 
-pub static SUPPORTED_TOKENS: Lazy<HashMap<String, &'static Lazy<Vec<&'static str>>>> =
+pub static SUPPORTED_TOKENS: Lazy<HashMap<String, Vec<&'static str>>> =
     Lazy::new(|| {
         let mut map = HashMap::new();
         map.insert(
             "arbitrum_sepolia".to_string(),
-            &SUPPORTED_TOKENS_ARBITRUM_SEPOLIA,
+            SUPPORTED_TOKENS_ARBITRUM_SEPOLIA.clone(), 
         );
-        map.insert(
+        map.insert(   
             "bitlayer_testnet".to_string(),
-            &SUPPORTED_TOKENS_BITLAYER_TESTNET,
+            SUPPORTED_TOKENS_BITLAYER_TESTNET.clone(),
         );
-        map.insert("move_testnet".to_string(), &SUPPORTED_TOKENS_MOVE_TESTNET);
-        map.insert("bera_testnet".to_string(), &SUPPORTED_TOKENS_BERA_TESTNET);
+        map.insert("move_testnet".to_string(), SUPPORTED_TOKENS_MOVE_TESTNET.clone());
+        map.insert("bera_testnet".to_string(), SUPPORTED_TOKENS_BERA_TESTNET.clone());
         map.insert(
             "optimus_testnet".to_string(),
-            &SUPPORTED_TOKENS_OPTIMUS_TESTNET,
+            SUPPORTED_TOKENS_OPTIMUS_TESTNET.clone(),
         );
         map
     });

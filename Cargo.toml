@@ -18,3 +18,4 @@ tokio = {version ="1.44.0" ,features = ["full"] }
 num-traits = "0.2.19"
 num-bigint = "0.4.6"
 dotenv = "0.15.0"
+chrono = "0.4.40"
