@@ -1,15 +1,4 @@
-#[path = "./interfaceutils.rs"]
-mod interfaceutils;
-
-#[path = "./responseinterfaceutils.rs"]
-mod responseinterfaceutils;
-
-#[path = "../configs/envconfig.rs"]
-mod envconfig;
-#[path = "./helpersutils.rs"]
-mod helpersutils;
-
-use helpersutils::{
+use crate::utils::helpersutils::{
     // BINANCE_KEYS,
     // BINANCE_SYMBOL_MAP,
     // KUCOIN_KEYS,
@@ -31,11 +20,11 @@ use helpersutils::{
     SYMBOL_TO_ADDRESS_MAPPING,
     SYMBOL_TO_DECIMAL_MAPPING,
 };
-use interfaceutils::AssetPricingInfo;
-use responseinterfaceutils::{ParclDetails, ParclIdResponse, ParclResponse, PythResponse};
+use crate::utils::interfaceutils::AssetPricingInfo;
+use crate::utils::responseinterfaceutils::{ParclDetails, ParclIdResponse, ParclResponse, PythResponse};
 use std::collections::HashMap;
 extern crate rand;
-use envconfig::ENV;
+use crate::configs::envconfig::ENV;
 use num_bigint::BigInt;
 use num_traits::pow;
 use rand::Rng;

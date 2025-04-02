@@ -1,28 +1,12 @@
-
-#[path = "../utils/pricesutils.rs"]
-mod pricesutils;
-
-#[path = "../utils/helpersutils.rs"]
-mod helpersutils;
-
-#[path = "../assets/commodity/config/commodityconfig.rs"]
-mod commodityconfig;
-
-#[path = "../assets/bonds/config/bondconfig.rs"]
-mod bondconfig;
-
-#[path = "../configs/envconfig.rs"]
-mod envconfig;
-
 #[path = "../../entity/src/mod.rs"]
 mod entities;
 
-use commodityconfig::{PERIOD_ID_MAPPING, SYMBOL_TO_ID_MAPPING};
-use envconfig::{CHAINID_MAP, ENV};
-use helpersutils::{
+use crate::assets::commodity::config::commodityconfig::{PERIOD_ID_MAPPING, SYMBOL_TO_ID_MAPPING};
+use crate::configs::envconfig::{CHAINID_MAP, ENV};
+use crate::utils::helpersutils::{
     PERIOD_MAP, PRICE_FETCH_INTERVAL, SYMBOL_TO_ADDRESS_MAPPING, TOKENS_MAPPINGS, sleep_ms,
 };
-use pricesutils::get_token_prices;
+use crate::utils::pricesutils::get_token_prices;
 use entities::{prelude::*, *};
 use sea_orm::entity::prelude::*;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, DbErr, EntityTrait, QueryFilter, Set};
