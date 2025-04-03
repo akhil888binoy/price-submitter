@@ -21,6 +21,7 @@ const MAX_LIMIT : u32 = 1000;
 
 #[get("/tickers")] 
 pub async fn getPriceTickers()-> Json<Vec<AssetPricingInfo2>>{
+    
     dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let db = Database::connect(&db_url).await.unwrap();
