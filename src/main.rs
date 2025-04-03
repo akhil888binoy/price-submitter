@@ -3,6 +3,9 @@ pub mod jobs;
 pub mod utils;
 pub mod configs;
 pub mod assets;
+pub mod data;
+pub mod controllers;
+
 use dotenv::dotenv;
 use std::env;
 use sea_orm::*;

@@ -17,7 +17,7 @@ pub async fn sleep_ms(ms: u64) {
     sleep(Duration::from_millis(ms)).await;
 }
 
-pub static SUPPORTED_PERIODS: Lazy<Vec<&'static str>> =
+pub static SUPPORTED_PERIODS: Lazy<Vec<&str>> =
     Lazy::new(|| vec!["1m", "5m", "15m", "1h", "4h", "1d"]);
 
 pub static PERIOD_MAP: Lazy<HashMap<&'static str, u64>> = Lazy::new(|| {
@@ -56,16 +56,16 @@ pub static SUPPORTED_TOKENS_BITLAYER_TESTNET: Lazy<Vec<&'static str>> = Lazy::ne
     ]
 });
 
-pub static SUPPORTED_TOKENS_MOVE_TESTNET: Lazy<Vec<&'static str>> =
+pub static SUPPORTED_TOKENS_MOVE_TESTNET: Lazy<Vec<&str>> =
     Lazy::new(|| vec!["WETH", "ETH", "USDC", "SOL", "HYPE", "BTC", "PENDLE"]);
 
-pub static SUPPORTED_TOKENS_BERA_TESTNET: Lazy<Vec<&'static str>> =
+pub static SUPPORTED_TOKENS_BERA_TESTNET: Lazy<Vec<& str>> =
     Lazy::new(|| vec!["WBERA", "BERA", "WBTC", "USDC"]);
 
-pub static SUPPORTED_TOKENS_OPTIMUS_TESTNET: Lazy<Vec<&'static str>> =
+pub static SUPPORTED_TOKENS_OPTIMUS_TESTNET: Lazy<Vec<& str>> =
     Lazy::new(|| vec!["WEVMOS", "WBTC", "WETH", "WSTETH", "USDC"]);
 
-pub static SUPPORTED_TOKENS: Lazy<HashMap<String, Vec<&'static str>>> =
+pub static SUPPORTED_TOKENS: Lazy<HashMap<String, Vec<&str>>> =
     Lazy::new(|| {
         let mut map = HashMap::new();
         map.insert(

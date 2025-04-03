@@ -26,6 +26,8 @@ mod entities;
 
 use crate::assets::commodity::config::commodityconfig::{PERIOD_ID_MAPPING, SYMBOL_TO_ID_MAPPING};
 use crate::configs::envconfig::{CHAINID_MAP, ENV};
+use std::error::Error;
+
 use crate::utils::helpersutils::{
     PERIOD_MAP, PRICE_FETCH_INTERVAL, TOKENS_MAPPINGS, sleep_ms,  
 };
@@ -41,6 +43,7 @@ extern crate rand;
 use num_bigint::BigInt;
 use num_traits::pow;
 use rand::Rng;
+use num_traits::{One, Zero};
 
 use super::interfaceutils::AssetPricingInfo2;
 
@@ -54,7 +57,7 @@ struct TokenPrice {
 
 
 const PRICE_DECIMALS : usize = 4;
-const PRECISION : u32 = 10;
+const PRECISION : i32 = 10;
 
 
 pub fn get_pyth_price_url() -> String {
@@ -487,36 +490,44 @@ pub async fn calculatePriceDecimals(price : f32)-> Option<usize> {
 
 }
 
-pub async fn  getTokenPricesFiltered(db: &DatabaseConnection){
+
+pub async fn  getTokenPricesFiltered(db: &DatabaseConnection)->Vec<AssetPricingInfo2>{
     let tokenPrices =  match gettokenpricesfromdb(db).await{
         Ok(data)=>data,
         Err(e)=>panic!("Error : Cannot get token prices form DB")
-    }; 
+    };  
 
     let mut tokenPricesArray = Vec::new();
 
     let timestamp = Utc::now();
     for (token , price) in tokenPrices{
+        let asset_price: i32 = (price * 10f32.powi(PRECISION)).round() as i32;
+        let asset_price_bigint = BigInt::from(asset_price);
+        let asset_decimals = match SYMBOL_TO_DECIMAL_MAPPING.get(token) {
+            Some(&decimals) => decimals,
+            None => panic!("Error: Asset not found in mapping"),
+        }; 
+
+        let power = asset_decimals as i32 - PRECISION as i32;
+        let scale_factor = BigInt::from(10).pow(power as u32); 
+
+        let tokenPrice = asset_price_bigint * scale_factor; 
+
         let tokenPricesFiltered = AssetPricingInfo2{
         tokenAddress: SYMBOL_TO_ADDRESS_MAPPING.get(token).unwrap().to_string(),
         tokenSymbol: token.to_string(),
-        minPrice: None,
-        maxPrice: None,
+        minPrice: Some(tokenPrice.to_string()),
+        maxPrice: Some(tokenPrice.to_string()),
         updatedAt: timestamp,
         priceDecimals: calculatePriceDecimals(price).await.unwrap() as f32,
         };
 
-         let assetPrice = price ;
-        
-            let scaled_price = assetPrice * 10_f64.powi(PRECISION as i32);
-            if scaled_price.is_finite() {
-                scaled_price as u64
-            } else {
-                0
-            }
 
+        tokenPricesArray.push(tokenPricesFiltered);
         
-    }
 
+         
+    }  
+    tokenPricesArray
 
 }
