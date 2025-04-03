@@ -19,13 +19,18 @@ pub mod controllers;
 
 use crate::jobs::index::executejobs;
 
+#[get("/world")]
+pub async fn index()->String{
+    "Hello".to_string()
+}
 
 #[launch]
 async fn rocket() -> _ {
 
     dotenv().ok(); 
 
-    executejobs().await;
+    tokio::spawn(executejobs());
+
 
     let port = 8000;
     print_network_info(port);
@@ -35,7 +40,7 @@ async fn rocket() -> _ {
 
     rocket::build()
         .manage(db)
-        .mount("/prices", routes![])
+        .mount("/world", routes![index])
     
     
 }
