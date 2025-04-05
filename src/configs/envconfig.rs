@@ -14,7 +14,7 @@ pub struct EnvConfig {
 }
 
 pub static ENV: Lazy<EnvConfig> = Lazy::new(|| {
-    let env_path = "/home/akhil888binoy/developer/rust-price-submitter/src/env.json"; 
+    let env_path = r"D:\avitus\price-submitter\src\env.json"; 
     let env_content = fs::read_to_string(env_path).expect("Failed to read env.json");
     println!("ENV content == {:?}", &env_content);
     serde_json::from_str(&env_content).expect("Failed to parse env.json")
