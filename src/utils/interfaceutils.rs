@@ -25,3 +25,38 @@ pub struct AssetPricingInfo2 {
     pub updatedAt: chrono::DateTime<Utc>,
     pub priceDecimals : f32
 }
+
+#[derive(Debug, Serialize)]
+pub struct PriceCandleResponse {
+    pub period: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct Price24HResponse {
+    pub _id : String,
+    pub high: f32,
+    pub low: f32,
+    pub open: f32,
+    pub close: f32
+}
+
+#[derive(Debug, Serialize)]
+pub struct DummyData {
+    pub lp: FeatureStats,
+    pub migration: FeatureStats,
+    pub trading: FeatureStats
+}
+
+#[derive(Debug, Serialize)]
+pub struct FeatureStats {
+    pub is_active: bool
+}
+
+impl Default for DummyData {
+    fn default() -> Self {
+        Self { 
+            lp: FeatureStats { is_active: false }, 
+            migration: FeatureStats { is_active: false }, 
+            trading: FeatureStats { is_active: false } }
+    }
+}

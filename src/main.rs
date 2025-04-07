@@ -1,7 +1,11 @@
-use rocket::{launch, routes, get, State};
+use controllers::IncentivesStip::get_dummy_data;
+use controllers::PriceCandles::get_price_candles;
+use controllers::PriceTickers::getPriceTickers;
+use controllers::Prices24h::get_price24h;
+use controllers::ReportUI::report_ui;
+use rocket::{get, launch, routes, Build, Rocket};
 use sea_orm::DatabaseConnection;
 use std::net::Ipv4Addr;
-use tokio::time::{interval, Duration};
 use std::env;
 use dotenv::dotenv;
 use sea_orm::*;
@@ -15,9 +19,24 @@ pub mod data;
 pub mod controllers;
 
 
-
-
 use crate::jobs::index::executejobs;
+
+pub struct DbConnection(pub DatabaseConnection);
+
+#[get("/")]
+fn hello() -> &'static str {
+    "Hello, world!"
+}
+
+async fn init_db() -> DbConnection {
+    dotenv().ok();
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let db = Database::connect(&db_url)
+        .await
+        .unwrap();
+
+    DbConnection(db)
+}
 
 #[get("/world")]
 pub async fn index()->String{
@@ -25,25 +44,23 @@ pub async fn index()->String{
 }
 
 #[launch]
-async fn rocket() -> _ {
+async fn rocket() -> Rocket<Build> {
 
-    dotenv().ok(); 
+    // dotenv().ok(); 
 
     tokio::spawn(executejobs());
-
 
     let port = 8000;
     print_network_info(port);
 
-    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let db = Database::connect(&db_url).await.unwrap();
+    let db = init_db().await;
+
+    // let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    // let db = Database::connect(&db_url).await.unwrap();
 
     rocket::build()
         .manage(db)
-        .mount("/world", routes![index])
-    
-    
-}
+
 
 fn print_network_info(port: u16) {
     let local_address = format!("http://localhost:{}", port);
