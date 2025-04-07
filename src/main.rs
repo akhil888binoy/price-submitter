@@ -38,6 +38,10 @@ async fn init_db() -> DbConnection {
     DbConnection(db)
 }
 
+#[get("/world")]
+pub async fn index()->String{
+    "Hello".to_string()
+}
 
 #[launch]
 async fn rocket() -> Rocket<Build> {
@@ -56,11 +60,7 @@ async fn rocket() -> Rocket<Build> {
 
     rocket::build()
         .manage(db)
-        .mount("/", routes![hello, get_price_candles, get_price24h, get_dummy_data, getPriceTickers, report_ui])
-        // .mount("/prices", routes![])
-        // .mount("/candles", routes![get_price_candles])
-        // .mount("/prices/24h", routes![get_price24h])
-}
+
 
 fn print_network_info(port: u16) {
     let local_address = format!("http://localhost:{}", port);
