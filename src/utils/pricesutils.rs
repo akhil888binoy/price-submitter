@@ -335,6 +335,7 @@ pub async fn get_token_prices_filtered() -> Result<Vec<AssetPricingInfo>, Box<dy
 }
 
 pub async fn gettokenpricesfromdb( db: &DatabaseConnection)-> Result<HashMap<&str, f32>, DbErr >{
+    let mut grouped_tokens = HashMap::new();
     let mut result = HashMap::new();
     let mut supportedfinaltokens = Vec::new();
     let supportedtokens = match SUPPORTED_TOKENS.get(&ENV.NETWORK){
@@ -364,7 +365,7 @@ pub async fn gettokenpricesfromdb( db: &DatabaseConnection)-> Result<HashMap<&st
             Some(data)=>data,
             None=>panic!("Error : Cannot get address")
         };
-        tokenAddresses.push(tokenaddress.to_string().to_lowercase());
+        tokenAddresses.push(tokenaddress.to_string());
     }
 
     let mut realEstateTokenAddress = Vec::new();
@@ -375,7 +376,7 @@ pub async fn gettokenpricesfromdb( db: &DatabaseConnection)-> Result<HashMap<&st
                 Some(data)=>data,
                 None=>panic!("Error : Cannot get token symbol")
             };
-            realEstateTokenAddress.push(realestatetoken.to_string().to_lowercase());
+            realEstateTokenAddress.push(realestatetoken.to_string());
         }
     }
     let chainid = match CHAINID_MAP.get(&ENV.NETWORK){
@@ -384,40 +385,38 @@ pub async fn gettokenpricesfromdb( db: &DatabaseConnection)-> Result<HashMap<&st
     };
 
       // Get regular token prices (1m period)
-      let tokens_data = PriceCandle::find()
+    let tokens_data = PriceCandle::find()
       .filter(price_candle::Column::Token.is_in(tokenAddresses.clone()))
       .filter(price_candle::Column::Period.eq("1m"))
       .filter(price_candle::Column::ChainId.eq(chainid.clone()))
       .order_by_desc(price_candle::Column::Timestamp)
       .all(db)
       .await;
-
-  // Group by token and get latest close price
-  let mut grouped_tokens = HashMap::new();
-
+    
+    // Group by token and get latest close price
     let tokensData = match tokens_data{
         Ok(data)=>data,
         Err(e)=>panic!("Error : Cannot get data from DB")
     };
     
-  for candle in tokensData {
+    for candle in tokensData {
         grouped_tokens.entry(candle.token.clone()) // Use token as key
         .or_insert(candle.close); // Store just the close price
-}
+    }
 
-  // Map to token symbols
-  for (token_addr, close) in grouped_tokens {
-      if let Some(index) = tokenAddresses.iter().position(|x| x == &token_addr) {
-          if let Some(token_symbol) = supportedfinaltokens.get(index) {
-              result.insert(token_symbol.clone(), close);
-          }
-      }
-  }
+    // Map to token symbols
+    for (token_addr, close) in grouped_tokens {
+        if let Some(index) = tokenAddresses.iter().position(|x| x == &token_addr) {
+            if let Some(token_symbol) = supportedfinaltokens.get(index) {
+                result.insert(token_symbol.clone(), close);
+            }
+        }
+    }
 
 
   // Get real estate token prices (1d period)
   let realestatedata = PriceCandle::find()
-      .filter(price_candle::Column::Token.is_in(realEstateTokenAddress.clone()))
+  .filter(price_candle::Column::Token.is_in(realEstateTokenAddress.clone()))
       .filter(price_candle::Column::Period.eq("1d"))
       .filter(price_candle::Column::ChainId.eq(chainid.clone()))
       .order_by_desc(price_candle::Column::Timestamp)
@@ -436,6 +435,7 @@ let real_estate_data = match realestatedata{
       grouped_real_estate.entry(candle.token.clone())
           .or_insert(candle.close);
   }
+
 
 
 

@@ -1,6 +1,8 @@
 use controllers::IncentivesStip::get_dummy_data;
 use controllers::PriceCandles::get_price_candles;
+use controllers::PriceTickers::getPriceTickers;
 use controllers::Prices24h::get_price24h;
+use controllers::ReportUI::report_ui;
 use rocket::{get, launch, routes, Build, Rocket};
 use sea_orm::DatabaseConnection;
 use std::net::Ipv4Addr;
@@ -54,7 +56,7 @@ async fn rocket() -> Rocket<Build> {
 
     rocket::build()
         .manage(db)
-        .mount("/", routes![hello, get_price_candles, get_price24h, get_dummy_data])
+        .mount("/", routes![hello, get_price_candles, get_price24h, get_dummy_data, getPriceTickers, report_ui])
         // .mount("/prices", routes![])
         // .mount("/candles", routes![get_price_candles])
         // .mount("/prices/24h", routes![get_price24h])

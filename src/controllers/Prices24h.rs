@@ -41,7 +41,7 @@ pub async fn get_price24h (
     let token_addresses = supported_tokens
         .iter()
         .map(|token_symbol|
-            SYMBOL_TO_ADDRESS_MAPPING.get(token_symbol.to_owned()).expect("Token not found").to_lowercase()
+            SYMBOL_TO_ADDRESS_MAPPING.get(token_symbol.to_owned()).expect("Token not found")
         )
         .collect::<Vec<_>>();
 
@@ -56,22 +56,24 @@ pub async fn get_price24h (
         .await
         .map_err(|e| BadRequest(Json(json!({"error": format!("Error getting data24hr: {:?}", e)}))))?;
     
+    println!("raw data, {:?}", raw_data);
     let mut grouped_data: HashMap<String, Model> = HashMap::new();
     
     for candle in raw_data {
         grouped_data.entry(candle.token.clone()).or_insert(candle);
     }
 
+
     let data24H = grouped_data
         .into_iter()
         .map(|(token, candle)| {
-            let token_symbol = supported_tokens[token_addresses.iter().position(|x| x == &token).unwrap()];
+            let token_symbol = supported_tokens[token_addresses.iter().position(|x| x.eq(&&token.to_string())).unwrap()];
             Price24HResponse {
                 _id: token_symbol.to_string(),
                 high: candle.high,
                 low: candle.low,
                 open: candle.open,
-                close: candle.close,
+                close: candle.close,    
             }
         })
         .collect::<Vec<Price24HResponse>>();
